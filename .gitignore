@@ -1,0 +1,5 @@
+## NextFlow
+*.command*
+*.nextflow*
+results*
+work*
