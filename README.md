@@ -12,8 +12,8 @@ their machine. If you do not have miniconda3 installed, please follow the instru
 to install it.
 
 ```
-git clone ...
-cd ...
+git clone https://github.com/KarchinLab/bulk-tcrseq.git
+cd bulk-tcrseq
 conda env create -f environment.yml
 conda activate bulk-tcrseq
 nextflow run bulk-tcrseq.nf \

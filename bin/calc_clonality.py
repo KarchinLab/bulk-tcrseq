@@ -8,74 +8,65 @@ Description: this script calculates the clonality of a TCR repertoire
 
 ## import packages
 import argparse
-import logging
-import csv
-import sys
+import pandas as pd
 from scipy.stats import entropy
 import numpy as np
 from pathlib import Path
+import csv
+# import logging
+# import sys
 
-logger = logging.getLogger()
+print('-- ENTERED calc_clonality.py--')
+
+# initialize parser
 parser = argparse.ArgumentParser(description='Calculate clonality of a TCR repertoire')
+
+# add arguments
+parser.add_argument('-m', '--metadata', 
+                    metavar='metadata', 
+                    type=str, 
+                    help='metadata passed in through samples CSV file')
+parser.add_argument('-c', '--counts', 
+                    metavar='counts', 
+                    type=argparse.FileType('r'), 
+                    help='counts file in TSV format')
+
+args = parser.parse_args() 
+
+## convert metadata to list
+s = args.metadata
+metadata = args.metadata[1:-1].split(', ')
+print('metadata looks like this: ' + str(metadata))
+
+# Read in the counts file
+counts = pd.read_csv(args.counts, sep='\t', header=0)
+counts = counts.rename(columns={'count (templates/reads)': 'read_count', 'frequencyCount (%)': 'frequency'})
+# print('counts columns: \n')
+# print(counts.columns)
 
 def calc_clonality(metadata, counts):
     """Calculate clonality of a TCR repertoire."""
 
-    # Read in the metadata file and counts file
-    print('metadata head looks like this: ' + str(metadata.head()))
-    print('counts head looks like this: ' + str(counts.head()))
+    clone_counts = counts['read_count']
+    clone_entropy = entropy(clone_counts, base=2)
+    num_clones = len(clone_counts)
+    num_TCRs = sum(clone_counts)
+    clonality = 1 - clone_entropy / np.log2(num_clones)
+    simpson_index = sum(clone_counts**2)/(num_TCRs**2)
+    simpson_index_corrected = sum(clone_counts*(clone_counts-1))/(num_TCRs*(num_TCRs-1))
 
-    # Calculate clonality for each sample
-    ## code here
+    # print('Number of clones: ' + str(num_clones))
+    # print('Number of TCRs: ' + str(num_TCRs))
+    # print('Simpson Index: ' + str(simpson_index))
+    # print('Simpson Index Corrected: ' + str(simpson_index_corrected))
+    # print('Clonality: ' + str(clonality))
+    # print('\n')
 
+    # write above values to csv file
+    print('--- Writing repertoire stats to file...')
+    with open('clonality.csv', 'w') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['sample_name', 'patient_id', 'timepoint', 'origin', 'num_clones', 'num_tcrs', 'simpson_index', 'simpson_index_corr', 'clonality'])
+        writer.writerow([metadata[0], metadata[1], metadata[2], metadata[3], num_clones, num_TCRs, simpson_index, simpson_index_corrected, clonality])
 
-    '''
-    # Read in the metadata file
-    with metadata.open(mode="r") as file_in:
-        reader = csv.DictReader(file_in, delimiter=",")
-        header = list(reader.fieldnames)
-        #header.insert(1, "single_end")
-        # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
-        with file_out.open(mode="w", newline="") as out_handle:
-            writer = csv.DictWriter(out_handle, header, delimiter=",")
-            writer.writeheader()
-    # Read in the counts file
-    with counts.open(mode="r") as file_in:
-        reader = csv.DictReader(file_in, delimiter=",")
-        header = list(reader.fieldnames)
-        #header.insert(1, "single_end")
-        # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
-        with file_out.open(mode="w", newline="") as out_handle:
-            writer = csv.DictWriter(out_handle, header, delimiter=",")
-            writer.writeheader()
-    '''
-
-def parse_args(argv=None):
-    """Define and parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Calculate clonality of a TCR repertoire",
-        epilog="Example: python calc_clonality.py -m metadata.csv -c counts.csv",
-    )
-    parser.add_argument(
-        "metadata",
-        metavar="metadata",
-        type=Path,
-        help="metadata file in CSV format",
-    )
-    parser.add_argument(
-        "counts",
-        metavar="counts",
-        type=Path,
-        help="counts file in TSV format",
-    )
-
-def main(argv=None):
-    """Coordinate argument parsing and program execution."""
-    args = parser.parse_args(argv)
-    logging.basicConfig(level=args.log_level, format="[%(levelname)s] %(message)s")
-    if not args.metadata.is_file():
-        logger.error(f"The given input file {args.metadata} was not found!")
-        sys.exit(2)
-    args.file_out.parent.mkdir(parents=True, exist_ok=True)
-    calc_clonality(args.metadata, args.counts)
-    #print(args.metadata)
+calc_clonality(metadata, counts)

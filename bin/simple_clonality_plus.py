@@ -19,8 +19,18 @@ clonality = 1 - clone_entropy / np.log2(num_clones)
 simpson_index = sum(clones**2)/(num_TCRs**2)
 simpson_index_corrected = sum(clones*(clones-1))/(num_TCRs*(num_TCRs-1))
 
+print('-- Simple Repertoire Statistics --')
+print('Number of clones: ' + str(num_clones))
+print('Number of TCRs: ' + str(num_TCRs))
+print('Simpson Index: ' + str(simpson_index))
+print('Simpson Index Corrected: ' + str(simpson_index_corrected))
+print('Clonality: ' + str(clonality))
+print('\n')
+
 #%% overlap measures
 # I suggest using dictoneries for the clones sizes internally like this
+
+print('-- Overlap Measures --')
 
 clone_table1 = {'CASSQAGVSNERLFF' : 10,
  'CASGDRTSSAETLYF' : 7,
@@ -70,3 +80,22 @@ jaccard_overlap = len(shared_clones) / len(all_clones)
 raw_overlap =  2*sum([clone_table1[x]*clone_table2[x] for x in shared_clones])/(num_TCRs1*num_TCRs2)
 morisita_overlap = raw_overlap/((simpson_index_corrected1 + simpson_index_corrected2))
 morisita_horn_overlap = raw_overlap/((simpson_index1 + simpson_index2))
+
+print('Number of clones in sample 1: ' + str(num_clones1))
+print('Number of TCRs in sample 1: ' + str(num_TCRs1))
+print('Simpson Index in sample 1: ' + str(simpson_index1))
+print('Simpson Index Corrected in sample 1: ' + str(simpson_index_corrected1))
+
+print('\n')
+
+print('Number of clones in sample 2: ' + str(num_clones2))
+print('Number of TCRs in sample 2: ' + str(num_TCRs2))
+print('Simpson Index in sample 2: ' + str(simpson_index2))
+print('Simpson Index Corrected in sample 2: ' + str(simpson_index_corrected2))
+
+print('\n')
+
+print('Raw Overlap: ' + str(raw_overlap))
+print('Jaccard Overlap: ' + str(jaccard_overlap))
+print('Morisita Overlap: ' + str(morisita_overlap))
+print('Morisita Horn Overlap: ' + str(morisita_horn_overlap))

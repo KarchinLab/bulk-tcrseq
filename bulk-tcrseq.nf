@@ -71,6 +71,7 @@ workflow {
         .set { sample_map }
         // .view()
 
+    println("-- Running clonality calc...")
     CLONALITY_CALC(
         sample_map
         )
