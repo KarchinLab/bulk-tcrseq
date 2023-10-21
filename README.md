@@ -16,8 +16,14 @@ git clone https://github.com/KarchinLab/bulk-tcrseq.git
 cd bulk-tcrseq
 conda env create -f environment.yml
 conda activate bulk-tcrseq
+```
+
+Once your environment is set up, run the pipeline with the following command:
+
+```
 nextflow run bulk-tcrseq.nf \
-    --sample_table=assets/sample_table.csv \
-    --patient_table=assets/patient_table.csv \
-    --output_dir=results 
+    --project_name=ribas_pd1 \
+    --sample_table=assets/ribas_pd1_sample_table.csv \
+    --patient_table=assets/ribas_pd1_patient_table.csv \
+    --output_dir=results_ribas_pd1 
 ```

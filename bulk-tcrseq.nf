@@ -30,7 +30,7 @@ BTC - BULK TCRSEQ PIPELINE
 Project parameters:
 - Project Name              : ${params.project_name}
 - Sample Table (CSV)        : ${params.sample_table}
-- Patient Meta-data (CSV)   : ${params.patient_meta}
+- Patient Meta-data (CSV)   : ${params.patient_table}
 - Output Directory          : ${params.output_dir}
 """
 
@@ -41,7 +41,8 @@ Project parameters:
 */
 
 include { INPUT_CHECK } from './modules/local/input_check.nf'
-include { CLONALITY_CALC } from './modules/local/clonality_calc.nf'
+include { SIMPLE_CALC } from './modules/local/simple_calc.nf'
+include { PLOT_SIMPLE } from './modules/local/plot_simple.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,20 +60,29 @@ workflow {
         file(params.patient_table)
         )
     
-    // INPUT_CHECK.out.sample_utf8.view()
-    // INPUT_CHECK.out.patient_utf8.view()
-
-    // println("-- Running simple clonality clac...")
     INPUT_CHECK.out.sample_utf8
         .splitCsv(header: true, sep: ',')
         .map { row -> 
             meta_map = [row.sample_id, row.patient_id, row.timepoint, row.origin] 
             [meta_map, file(row.file_path)]}
         .set { sample_map }
-        // .view()
 
-    println("-- Running clonality calc...")
-    CLONALITY_CALC(
+    // TODO: rename to simple_calc
+    println("-- Running simple calc...")
+    SIMPLE_CALC(
         sample_map
         )
+
+    SIMPLE_CALC.out.simple_csv
+        .collectFile()
+        .set { combined_simple_csv }
+
+    // TODO: sequence_calc module for calculating selection factor
+        // see paper -
+    
+    println("-- Running plot simple...")
+    PLOT_SIMPLE(
+        combined_simple_csv
+        )
+    
 }

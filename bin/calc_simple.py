@@ -16,7 +16,7 @@ import csv
 # import logging
 # import sys
 
-print('-- ENTERED calc_clonality.py--')
+# print('-- ENTERED calc_clonality.py--')
 
 # initialize parser
 parser = argparse.ArgumentParser(description='Calculate clonality of a TCR repertoire')
@@ -36,7 +36,7 @@ args = parser.parse_args()
 ## convert metadata to list
 s = args.metadata
 metadata = args.metadata[1:-1].split(', ')
-print('metadata looks like this: ' + str(metadata))
+# print('metadata looks like this: ' + str(metadata))
 
 # Read in the counts file
 counts = pd.read_csv(args.counts, sep='\t', header=0)
@@ -63,10 +63,10 @@ def calc_clonality(metadata, counts):
     # print('\n')
 
     # write above values to csv file
-    print('--- Writing repertoire stats to file...')
-    with open('clonality.csv', 'w') as csvfile:
+    # print('--- Writing repertoire stats to file...')
+    with open('simple_calc.csv', 'w') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['sample_name', 'patient_id', 'timepoint', 'origin', 'num_clones', 'num_tcrs', 'simpson_index', 'simpson_index_corr', 'clonality'])
+        # writer.writerow(['sample_name', 'patient_id', 'timepoint', 'origin', 'num_clones', 'num_tcrs', 'simpson_index', 'simpson_index_corr', 'clonality'])
         writer.writerow([metadata[0], metadata[1], metadata[2], metadata[3], num_clones, num_TCRs, simpson_index, simpson_index_corrected, clonality])
 
 calc_clonality(metadata, counts)
