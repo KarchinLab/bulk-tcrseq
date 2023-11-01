@@ -25,5 +25,5 @@ nextflow run bulk-tcrseq.nf \
     --project_name=ribas_pd1 \
     --sample_table=assets/ribas_pd1_sample_table.csv \
     --patient_table=assets/ribas_pd1_patient_table.csv \
-    --output_dir=results_ribas_pd1 
+    --output_dir=outdir
 ```
