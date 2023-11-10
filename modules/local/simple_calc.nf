@@ -2,6 +2,8 @@ process SIMPLE_CALC {
     tag "${sample_meta[1]}"
     label 'process_single'
 
+    // container
+
     publishDir "${params.output_dir}/simple_calc", mode: 'copy'
 
     input:

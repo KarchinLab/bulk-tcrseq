@@ -3,14 +3,17 @@ process PLOT_SIMPLE {
     tag "${combined_clonality_csv}"
     label 'plot_simple'
 
+    // container
+
     publishDir "${params.output_dir}/plot_simple", mode: 'copy'
     
     input:
     file combined_clonality_csv
 
     output:
-    path '*.png'
-    path '*.html'
+    path 'clonality.png'
+    path 'timecourse.png'
+    path 'simple_stats.html'
 
     script:    
     """
