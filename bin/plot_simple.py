@@ -13,8 +13,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# define functions
-def plot_timecourse(df, x_col, y_col, patient_col):
+# initialize parser
+parser = argparse.ArgumentParser(description='Plotting simple clonality calculations on TCR repertoire')
+parser.add_argument('combined_csv', 
+    metavar='combined_csv', 
+    type=argparse.FileType('r'), 
+    help='combined CSV file')
+
+args = parser.parse_args()
+
+# Read in the combined CSV file with specified header
+df = pd.read_csv(args.combined_csv, sep=',', header=0, 
+                 names=['sample_id', 'patient_id', 'timepoint', 'origin', 'num_clones', 
+                        'num_TCRs', 'simpson_index', 'simpson_index_corrected', 'clonality',
+                        'num_in', 'num_out', 'num_stop', 'pct_prod', 'pct_out', 'pct_stop', 'pct_nonprod',
+                        'cdr3_len'])
+
+##### ==================================================================== #####
+#
+#           NEW CODE BELOW
+#
+##### ==================================================================== #####
+
+## making a function to create combined plot
+
+def plot_timecourse2(df, x_col, y_col, patient_col):
     # Create a list of colors for the scatter plot points
     colors = []
     for timepoint in df[x_col]:
@@ -47,79 +70,113 @@ def plot_timecourse(df, x_col, y_col, patient_col):
     # Add labels and title to the plot
     plt.xlabel(x_col)
     plt.ylabel(y_col)
-    plt.title(f'{y_col} over {x_col}')
 
-# initialize parser
-parser = argparse.ArgumentParser(description='Plotting simple clonality calculations on TCR repertoire')
-parser.add_argument('combined_csv', 
-    metavar='combined_csv', 
-    type=argparse.FileType('r'), 
-    help='combined CSV file')
+def plt_combined (df, x_col, y_col, patient_col='patient_id'):
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    fig.tight_layout(pad=2)
 
-args = parser.parse_args()
+    ## box/strip plots overlaid
+    sns.boxplot(data=df, x=x_col, y=y_col, showfliers=False, ax=axs[0], color='white')
+    sns.stripplot(data=df, x=x_col, y=y_col, color='black', size=4, ax=axs[0])
+    axs[0].set(xlabel='', ylabel='')
 
-# Read in the combined CSV file with specified header
-combined_df = pd.read_csv(args.combined_csv, 
-                          sep=',', header=0, 
-                          names=['sample_id', 'patient_id', 'timepoint', 'origin', 'num_clones', 
-                                 'num_TCRs', 'simpson_index', 'simpson_index_corrected', 'clonality',
-                                 'num_in', 'num_out', 'num_stop', 'pct_prod', 'pct_out', 'pct_stop', 'pct_nonprod'])
+    ## line plot using plot_timecourse2()
+    plot_timecourse2(df, x_col=x_col, y_col=y_col, patient_col=patient_col)
+    axs[1].set(ylabel='', xlabel='')
+
+    ## figure adjustments
+    fig.subplots_adjust(top=0.90)
+
+    ## add title
+    titles = {
+        'num_clones': 'Number of unique T cell Clones',
+        'clonality': 'Clonality of T cell repertoire',
+        'simpson_index_corrected': 'Corrected Simpson index',
+        'pct_prod': 'Percentage of productive TCR sequences',
+        'cdr3_len': 'Length of CDR3 sequences'
+    }
+    fig.suptitle(titles[y_col], fontsize=16)
+
+    ## save the plot
+    print('saving figure as: ' + y_col + '.png')
+    plt.savefig(y_col + '.png')
+
+## plot all the things
+for var in ['num_clones', 'clonality', 'simpson_index_corrected', 'pct_prod', 'cdr3_len']:
+    plt_combined(df, x_col='timepoint', y_col=var, patient_col='patient_id')
+
+##### ==================================================================== #####
+#
+#           NEW CODE ABOVE
+#
+##### ==================================================================== #####
+
+
+##### ==================================================================== #####
+#
+#           OLD CODE BELOW
+#
+##### ==================================================================== #####
 
 ## initializing the subplot
-fig, axs = plt.subplots(ncols=4, nrows=1,
-                        figsize=(15,5))
-fig.tight_layout(pad=2)
+# fig, axs = plt.subplots(ncols=4, nrows=1,
+#                         figsize=(15,5))
+# fig.tight_layout(pad=2)
 
-## num_clones boxplot
-sns.boxplot(data=combined_df, x='timepoint', y='num_clones', showfliers=False, ax=axs[0], color='white')
-sns.stripplot(data=combined_df, x='timepoint', y='num_clones',color='black', size=4, ax=axs[0])
-axs[0].set(xlabel='', ylabel='')
-axs[0].set_title('Num Clones')
+# ## num_clones boxplot
+# sns.boxplot(data=combined_df, x='timepoint', y='num_clones', showfliers=False, ax=axs[0], color='white')
+# sns.stripplot(data=combined_df, x='timepoint', y='num_clones',color='black', size=4, ax=axs[0])
+# axs[0].set(xlabel='', ylabel='')
+# axs[0].set_title('Num Clones')
 
-## clonality boxplot
-sns.boxplot(data=combined_df, x='timepoint', y='clonality', showfliers=False, ax=axs[1], color='white')
-sns.stripplot(data=combined_df, x='timepoint', y='clonality',color='black', size=4, ax=axs[1])
-axs[1].set(xlabel='', ylabel='')
-axs[1].set_title('Clonality')
+# ## clonality boxplot
+# sns.boxplot(data=combined_df, x='timepoint', y='clonality', showfliers=False, ax=axs[1], color='white')
+# sns.stripplot(data=combined_df, x='timepoint', y='clonality',color='black', size=4, ax=axs[1])
+# axs[1].set(xlabel='', ylabel='')
+# axs[1].set_title('Clonality')
 
-## simpson_index_corrected boxplot
-sns.boxplot(data=combined_df, x='timepoint', y='simpson_index_corrected', showfliers=False, ax=axs[2], color='white')
-sns.stripplot(data=combined_df, x='timepoint', y='simpson_index_corrected',color='black', size=4, ax=axs[2])
-axs[2].set(xlabel='', ylabel='')
-axs[2].set_title('Simpson Index Corrected')
+# ## simpson_index_corrected boxplot
+# sns.boxplot(data=combined_df, x='timepoint', y='simpson_index_corrected', showfliers=False, ax=axs[2], color='white')
+# sns.stripplot(data=combined_df, x='timepoint', y='simpson_index_corrected',color='black', size=4, ax=axs[2])
+# axs[2].set(xlabel='', ylabel='')
+# axs[2].set_title('Simpson Index Corrected')
 
-## pct_prod boxplot
-sns.boxplot(data=combined_df, x='timepoint', y='pct_prod', showfliers=False, ax=axs[3], color='white')
-sns.stripplot(data=combined_df, x='timepoint', y='pct_prod',color='black', size=4, ax=axs[3])
-axs[3].set(xlabel='', ylabel='')
-axs[3].set_title('Percent Productive')
+# ## pct_prod boxplot
+# sns.boxplot(data=combined_df, x='timepoint', y='pct_prod', showfliers=False, ax=axs[3], color='white')
+# sns.stripplot(data=combined_df, x='timepoint', y='pct_prod',color='black', size=4, ax=axs[3])
+# axs[3].set(xlabel='', ylabel='')
+# axs[3].set_title('Percent Productive')
 
 ## save the plot
-plt.savefig('clonality.png')
+# plt.savefig('clonality.png')
 
-##### TCR PRODUCTIVITY PLOTS #####
+# ##### TCR PRODUCTIVITY PLOTS #####
+
+# # Define the variables to plot
+# variables = ['num_clones', 'clonality', 'simpson_index_corrected', 'pct_prod']
+
+# # Create a figure object for the grid of plots
+# fig = plt.figure(figsize=(15, 5))
+# fig.tight_layout(pad=2)
+
+# # Iterate over the variables and plot each one in a separate axis
+# for i, var in enumerate(variables):
+#     # Create a new axis object for the current plot
+#     ax = fig.add_subplot(1, 4, i+1)
+
+#     # Plot the current variable in the corresponding axis
+#     plot_timecourse(combined_df, 'timepoint', var, 'patient_id')
+
+#     # Add a title to the axis
+#     ax.set(ylabel='', xlabel='')
+#     ax.set_title(var)
+
+# # Add a common y-axis label to the leftmost plot
+# fig.text(0.05, 0.5, '', va='center', rotation='vertical', fontsize=14)
+
+# ## save the plot
+# plt.savefig('timecourse.png')
+
+##### CDR3 LENGTH PLOTS #####
 
 # Define the variables to plot
-variables = ['num_clones', 'clonality', 'simpson_index_corrected', 'pct_prod']
-
-# Create a figure object for the grid of plots
-fig = plt.figure(figsize=(15, 5))
-fig.tight_layout(pad=2)
-
-# Iterate over the variables and plot each one in a separate axis
-for i, var in enumerate(variables):
-    # Create a new axis object for the current plot
-    ax = fig.add_subplot(1, 4, i+1)
-
-    # Plot the current variable in the corresponding axis
-    plot_timecourse(combined_df, 'timepoint', var, 'patient_id')
-
-    # Add a title to the axis
-    ax.set(ylabel='', xlabel='')
-    ax.set_title(var)
-
-# Add a common y-axis label to the leftmost plot
-fig.text(0.05, 0.5, '', va='center', rotation='vertical', fontsize=14)
-
-## save the plot
-plt.savefig('timecourse.png')

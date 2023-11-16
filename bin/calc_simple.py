@@ -70,6 +70,8 @@ def calc_clonality(metadata, counts):
     pct_nonprod = pct_out + pct_stop
 
     ## cdr3 info
+    cdr3_len = counts['cdr3Length']
+
     # CDR3_dict = {}
     # for seq in counts['aminoAcid']:
     #     print('seq looks like this: ' + str(seq))
@@ -99,12 +101,11 @@ def calc_clonality(metadata, counts):
     print('j_genes looks like this: ' + str(j_genes))
 
     # write above values to csv file
-    # print('--- Writing repertoire stats to file...')
     with open('simple_calc.csv', 'w') as csvfile:
         writer = csv.writer(csvfile)
-        # writer.writerow(['sample_name', 'patient_id', 'timepoint', 'origin', 'num_clones', 'num_tcrs', 'simpson_index', 'simpson_index_corr', 'clonality'])
         writer.writerow([metadata[0], metadata[1], metadata[2], metadata[3], 
                          num_clones, num_TCRs, simpson_index, simpson_index_corrected, clonality,
-                         num_in, num_out, num_stop, pct_prod, pct_out, pct_stop, pct_nonprod])
+                         num_in, num_out, num_stop, pct_prod, pct_out, pct_stop, pct_nonprod,
+                         cdr3_len])
 
 calc_clonality(metadata, counts)

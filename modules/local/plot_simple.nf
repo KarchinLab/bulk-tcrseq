@@ -11,8 +11,11 @@ process PLOT_SIMPLE {
     file combined_clonality_csv
 
     output:
+    path 'num_clones.png'
     path 'clonality.png'
-    path 'timecourse.png'
+    path 'simpson_index_corrected.png'
+    path 'pct_prod.png'
+    path 'cdr3_len.png'
     path 'simple_stats.html'
 
     script:    
