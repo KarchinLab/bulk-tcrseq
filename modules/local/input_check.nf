@@ -1,10 +1,7 @@
 process INPUT_CHECK {
     tag "${sample_table}"
 
-    conda "conda-forge::python=3.8.3"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/python:3.8.3' :
-        'biocontainers/python:3.8.3' }"
+    container "domebraccia/bulktcr:0.1"
 
     publishDir "${params.output_dir}/input_check", mode: 'copy'
 

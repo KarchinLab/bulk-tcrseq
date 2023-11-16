@@ -2,7 +2,7 @@ process SIMPLE_CALC {
     tag "${sample_meta[1]}"
     label 'process_single'
 
-    // container
+    container "domebraccia/bulktcr:0.2"
 
     publishDir "${params.output_dir}/simple_calc", mode: 'copy'
 

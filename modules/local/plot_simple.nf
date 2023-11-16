@@ -3,7 +3,7 @@ process PLOT_SIMPLE {
     tag "${combined_clonality_csv}"
     label 'plot_simple'
 
-    // container
+    container "domebraccia/bulktcr:0.2"
 
     publishDir "${params.output_dir}/plot_simple", mode: 'copy'
     
@@ -23,9 +23,6 @@ process PLOT_SIMPLE {
 
     ## copy jupyter notebook to output directory
     cp $projectDir/notebooks/plot_simple.ipynb simple_stats.ipynb
-
-    ## alternate way to render ipynb report to html with cmd line args
-    #python $projectDir/bin/nb_wrapper.py simple_stats.ipynb --int_param 12
 
     ## render ipynb report to html
     jupyter nbconvert simple_stats.ipynb --to html --execute
