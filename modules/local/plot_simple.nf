@@ -15,7 +15,7 @@ process PLOT_SIMPLE {
     path 'clonality.png'
     path 'simpson_index_corrected.png'
     path 'pct_prod.png'
-    path 'cdr3_len.png'
+    path 'cdr3_avg_len.png'
     path 'simple_stats.html'
 
     script:    

@@ -9,6 +9,7 @@ Description: this script calculates the clonality of a TCR repertoire
 ## import packages
 import argparse
 import pandas as pd
+import numpy as np
 from scipy.stats import entropy
 import numpy as np
 from pathlib import Path
@@ -70,7 +71,8 @@ def calc_clonality(metadata, counts):
     pct_nonprod = pct_out + pct_stop
 
     ## cdr3 info
-    cdr3_len = counts['cdr3Length']
+    cdr3_lens = counts['cdr3Length']
+    cdr3_avg_len = np.mean(cdr3_lens)
 
     # CDR3_dict = {}
     # for seq in counts['aminoAcid']:
@@ -106,6 +108,6 @@ def calc_clonality(metadata, counts):
         writer.writerow([metadata[0], metadata[1], metadata[2], metadata[3], 
                          num_clones, num_TCRs, simpson_index, simpson_index_corrected, clonality,
                          num_in, num_out, num_stop, pct_prod, pct_out, pct_stop, pct_nonprod,
-                         cdr3_len])
+                         cdr3_avg_len])
 
 calc_clonality(metadata, counts)

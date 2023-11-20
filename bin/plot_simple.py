@@ -27,7 +27,7 @@ df = pd.read_csv(args.combined_csv, sep=',', header=0,
                  names=['sample_id', 'patient_id', 'timepoint', 'origin', 'num_clones', 
                         'num_TCRs', 'simpson_index', 'simpson_index_corrected', 'clonality',
                         'num_in', 'num_out', 'num_stop', 'pct_prod', 'pct_out', 'pct_stop', 'pct_nonprod',
-                        'cdr3_len'])
+                        'cdr3_avg_len'])
 
 ##### ==================================================================== #####
 #
@@ -93,7 +93,7 @@ def plt_combined (df, x_col, y_col, patient_col='patient_id'):
         'clonality': 'Clonality of T cell repertoire',
         'simpson_index_corrected': 'Corrected Simpson index',
         'pct_prod': 'Percentage of productive TCR sequences',
-        'cdr3_len': 'Length of CDR3 sequences'
+        'cdr3_avg_len': 'Average Length of CDR3 sequences'
     }
     fig.suptitle(titles[y_col], fontsize=16)
 
@@ -102,7 +102,7 @@ def plt_combined (df, x_col, y_col, patient_col='patient_id'):
     plt.savefig(y_col + '.png')
 
 ## plot all the things
-for var in ['num_clones', 'clonality', 'simpson_index_corrected', 'pct_prod', 'cdr3_len']:
+for var in ['num_clones', 'clonality', 'simpson_index_corrected', 'pct_prod', 'cdr3_avg_len']:
     plt_combined(df, x_col='timepoint', y_col=var, patient_col='patient_id')
 
 ##### ==================================================================== #####
