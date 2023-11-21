@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pickle
 
 # initialize parser
 parser = argparse.ArgumentParser(description='Plotting simple clonality calculations on TCR repertoire')
@@ -19,6 +20,10 @@ parser.add_argument('combined_csv',
     metavar='combined_csv', 
     type=argparse.FileType('r'), 
     help='combined CSV file')
+parser.add_argument('pickle_files', nargs='*',
+    metavar='pickle_files',
+    type=argparse.FileType('rb'),
+    help='pickled gene usage data')
 
 args = parser.parse_args()
 
@@ -29,9 +34,22 @@ df = pd.read_csv(args.combined_csv, sep=',', header=0,
                         'num_in', 'num_out', 'num_stop', 'pct_prod', 'pct_out', 'pct_stop', 'pct_nonprod',
                         'cdr3_avg_len'])
 
+# Read in the pickled gene usage data
+for file in args.pickle_files:
+    # get filen name of file
+    filename = file.split('/')[-1].split('.')[0]
+    pickle.load(file)
+    print('loaded pickle file: ' + str(file))
+
+# global variables
+print('global variables: \n' + str(globals().keys()))
+
+# local variables
+print('local variables: \n' + str(locals().keys()))
+
 ##### ==================================================================== #####
 #
-#           NEW CODE BELOW
+#           COMBINED BOX AND LINE TIMECOURSE PLOTS
 #
 ##### ==================================================================== #####
 
@@ -107,76 +125,9 @@ for var in ['num_clones', 'clonality', 'simpson_index_corrected', 'pct_prod', 'c
 
 ##### ==================================================================== #####
 #
-#           NEW CODE ABOVE
+#           GENE USAGE PLOTS
 #
 ##### ==================================================================== #####
 
+## import pickled data 
 
-##### ==================================================================== #####
-#
-#           OLD CODE BELOW
-#
-##### ==================================================================== #####
-
-## initializing the subplot
-# fig, axs = plt.subplots(ncols=4, nrows=1,
-#                         figsize=(15,5))
-# fig.tight_layout(pad=2)
-
-# ## num_clones boxplot
-# sns.boxplot(data=combined_df, x='timepoint', y='num_clones', showfliers=False, ax=axs[0], color='white')
-# sns.stripplot(data=combined_df, x='timepoint', y='num_clones',color='black', size=4, ax=axs[0])
-# axs[0].set(xlabel='', ylabel='')
-# axs[0].set_title('Num Clones')
-
-# ## clonality boxplot
-# sns.boxplot(data=combined_df, x='timepoint', y='clonality', showfliers=False, ax=axs[1], color='white')
-# sns.stripplot(data=combined_df, x='timepoint', y='clonality',color='black', size=4, ax=axs[1])
-# axs[1].set(xlabel='', ylabel='')
-# axs[1].set_title('Clonality')
-
-# ## simpson_index_corrected boxplot
-# sns.boxplot(data=combined_df, x='timepoint', y='simpson_index_corrected', showfliers=False, ax=axs[2], color='white')
-# sns.stripplot(data=combined_df, x='timepoint', y='simpson_index_corrected',color='black', size=4, ax=axs[2])
-# axs[2].set(xlabel='', ylabel='')
-# axs[2].set_title('Simpson Index Corrected')
-
-# ## pct_prod boxplot
-# sns.boxplot(data=combined_df, x='timepoint', y='pct_prod', showfliers=False, ax=axs[3], color='white')
-# sns.stripplot(data=combined_df, x='timepoint', y='pct_prod',color='black', size=4, ax=axs[3])
-# axs[3].set(xlabel='', ylabel='')
-# axs[3].set_title('Percent Productive')
-
-## save the plot
-# plt.savefig('clonality.png')
-
-# ##### TCR PRODUCTIVITY PLOTS #####
-
-# # Define the variables to plot
-# variables = ['num_clones', 'clonality', 'simpson_index_corrected', 'pct_prod']
-
-# # Create a figure object for the grid of plots
-# fig = plt.figure(figsize=(15, 5))
-# fig.tight_layout(pad=2)
-
-# # Iterate over the variables and plot each one in a separate axis
-# for i, var in enumerate(variables):
-#     # Create a new axis object for the current plot
-#     ax = fig.add_subplot(1, 4, i+1)
-
-#     # Plot the current variable in the corresponding axis
-#     plot_timecourse(combined_df, 'timepoint', var, 'patient_id')
-
-#     # Add a title to the axis
-#     ax.set(ylabel='', xlabel='')
-#     ax.set_title(var)
-
-# # Add a common y-axis label to the leftmost plot
-# fig.text(0.05, 0.5, '', va='center', rotation='vertical', fontsize=14)
-
-# ## save the plot
-# plt.savefig('timecourse.png')
-
-##### CDR3 LENGTH PLOTS #####
-
-# Define the variables to plot

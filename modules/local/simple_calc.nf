@@ -11,6 +11,7 @@ process SIMPLE_CALC {
 
     output:
     path 'simple_calc.csv', emit: simple_csv
+    path 'gene_usage_*.pkl', emit: gene_usage_pkl
 
     script:
     """

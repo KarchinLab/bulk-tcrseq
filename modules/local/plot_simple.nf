@@ -8,7 +8,8 @@ process PLOT_SIMPLE {
     publishDir "${params.output_dir}/plot_simple", mode: 'copy'
     
     input:
-    file combined_clonality_csv
+    path combined_clonality_csv
+    path gene_usage_pkl
 
     output:
     path 'num_clones.png'
@@ -22,7 +23,8 @@ process PLOT_SIMPLE {
     """
     ## plot simple stats calculated from TCR counts data
     python $projectDir/bin/plot_simple.py \
-        $combined_clonality_csv
+        $combined_clonality_csv \
+        $gene_usage_pkl
 
     ## copy jupyter notebook to output directory
     cp $projectDir/notebooks/plot_simple.ipynb simple_stats.ipynb

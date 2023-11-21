@@ -1,5 +1,8 @@
 ## NextFlow
 *.command*
 *.nextflow*
+*.dot
+
 results*
 work*
+test*

@@ -14,6 +14,7 @@ from scipy.stats import entropy
 import numpy as np
 from pathlib import Path
 import csv
+import pickle
 # import logging
 # import sys
 
@@ -74,34 +75,6 @@ def calc_clonality(metadata, counts):
     cdr3_lens = counts['cdr3Length']
     cdr3_avg_len = np.mean(cdr3_lens)
 
-    # CDR3_dict = {}
-    # for seq in counts['aminoAcid']:
-    #     print('seq looks like this: ' + str(seq))
-    #     if len(seq) == 0:
-    #         continue
-    #     else:
-    #         if seq not in CDR3_dict:
-    #             CDR3_dict[seq] = [counts['read_count'], counts['frequency'], counts['cdr3Length'], 
-    #                               counts['vGeneName'], counts['dGeneName'], counts['jGeneName']]
-    #         else:
-    #             continue
-    # print('CDR3_dict looks like this: ' + str(CDR3_dict))
-
-    # calculate gene usage
-    v_family = counts['vFamilyName'].value_counts(dropna=False)
-    d_family = counts['dFamilyName'].value_counts(dropna=False)
-    j_family = counts['jFamilyName'].value_counts(dropna=False)
-    print('v_family looks like this: ' + str(v_family))
-    print('d_family looks like this: ' + str(d_family))
-    print('j_family looks like this: ' + str(j_family))
-
-    v_genes = counts['vGeneName'].value_counts(dropna=False)
-    d_genes = counts['dGeneName'].value_counts(dropna=False)
-    j_genes = counts['jGeneName'].value_counts(dropna=False)
-    print('v_genes looks like this: ' + str(v_genes))
-    print('d_genes looks like this: ' + str(d_genes))
-    print('j_genes looks like this: ' + str(j_genes))
-
     # write above values to csv file
     with open('simple_calc.csv', 'w') as csvfile:
         writer = csv.writer(csvfile)
@@ -109,5 +82,24 @@ def calc_clonality(metadata, counts):
                          num_clones, num_TCRs, simpson_index, simpson_index_corrected, clonality,
                          num_in, num_out, num_stop, pct_prod, pct_out, pct_stop, pct_nonprod,
                          cdr3_avg_len])
+        
+    # store v_family gene usage in a dictionary
+    v_family = counts['vFamilyName'].value_counts(dropna=False).to_dict()
+    d_family = counts['dFamilyName'].value_counts(dropna=False).to_dict()
+    j_family = counts['jFamilyName'].value_counts(dropna=False).to_dict()
+    v_genes = counts['vGeneName'].value_counts(dropna=False).to_dict()
+    d_genes = counts['dGeneName'].value_counts(dropna=False).to_dict()
+    j_genes = counts['jGeneName'].value_counts(dropna=False).to_dict()
+
+    # store dictionaries in a list and output to pickle
+
+    prefix = "dynamic_"
+    suffix = "_variable"
+    var_num = 1
+
+    # Creating dynamic variable name using locals()
+    gene_usage = [v_family, d_family, j_family, v_genes, d_genes, j_genes]
+    with open('gene_usage_' + str(metadata[0]) + '.pkl', 'wb') as f:
+        pickle.dump(gene_usage, f)
 
 calc_clonality(metadata, counts)
