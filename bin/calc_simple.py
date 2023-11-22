@@ -76,7 +76,7 @@ def calc_clonality(metadata, counts):
     cdr3_avg_len = np.mean(cdr3_lens)
 
     # write above values to csv file
-    with open('simple_calc.csv', 'w') as csvfile:
+    with open('simple_stats.csv', 'w') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow([metadata[0], metadata[1], metadata[2], metadata[3], 
                          num_clones, num_TCRs, simpson_index, simpson_index_corrected, clonality,
@@ -91,13 +91,7 @@ def calc_clonality(metadata, counts):
     d_genes = counts['dGeneName'].value_counts(dropna=False).to_dict()
     j_genes = counts['jGeneName'].value_counts(dropna=False).to_dict()
 
-    # store dictionaries in a list and output to pickle
-
-    prefix = "dynamic_"
-    suffix = "_variable"
-    var_num = 1
-
-    # Creating dynamic variable name using locals()
+    # store dictionaries in a list and output to pickle file
     gene_usage = [v_family, d_family, j_family, v_genes, d_genes, j_genes]
     with open('gene_usage_' + str(metadata[0]) + '.pkl', 'wb') as f:
         pickle.dump(gene_usage, f)
