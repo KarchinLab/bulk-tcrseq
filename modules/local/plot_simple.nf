@@ -1,14 +1,14 @@
 // process to plot simple clonality measures from CLONALITY_CALC
 process PLOT_SIMPLE {
-    tag "${combined_clonality_csv}"
+    tag "${simple_stats_csv}"
     label 'plot_simple'
 
-    container "domebraccia/bulktcr:0.2"
+    container "domebraccia/bulktcr:0.3"
 
     publishDir "${params.output_dir}/plot_simple", mode: 'copy'
     
     input:
-    path combined_clonality_csv
+    path simple_stats_csv
     path gene_usage_pkl
 
     output:
@@ -23,14 +23,14 @@ process PLOT_SIMPLE {
     """
     ## plot simple stats calculated from TCR counts data
     python $projectDir/bin/plot_simple.py \
-        $combined_clonality_csv \
+        $simple_stats_csv \
         $gene_usage_pkl
 
-    ## copy jupyter notebook to output directory
-    cp $projectDir/notebooks/plot_simple.ipynb simple_stats.ipynb
+    ## copy quarto notebook to output directory
+    cp $projectDir/notebooks/plot_simple.qmd simple_stats.qmd
 
-    ## render ipynb report to html
-    jupyter nbconvert simple_stats.ipynb --to html --execute
+    ## render qmd report to html
+    quarto render simple_stats.qmd
     """
     
     }

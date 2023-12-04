@@ -13,6 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pickle
+import os
 
 # initialize parser
 parser = argparse.ArgumentParser(description='Plotting simple clonality calculations on TCR repertoire')
@@ -37,11 +38,11 @@ df = pd.read_csv(args.combined_csv, sep=',', header=0,
 # Read in the pickled gene usage data
 for file in args.pickle_files:
     # get name of file
-    filename = file.split('/')[-1].split('.')[0]
+    current_filename = os.path.splitext(os.path.basename(file.name))[0]
 
     # dynamically name the loaded data using filename
-    globals()[filename] = pickle.load(file)
-    print('loaded pickle file: ' + str(file))
+    globals()[current_filename] = pickle.load(file)
+    print('loaded pickle file: ' + current_filename)
 
 # global variables
 print('global variables: \n' + str(globals().keys()))
