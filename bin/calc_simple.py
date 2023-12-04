@@ -93,7 +93,7 @@ def calc_clonality(metadata, counts):
 
     # store dictionaries in a list and output to pickle file
     gene_usage = [v_family, d_family, j_family, v_genes, d_genes, j_genes]
-    with open('gene_usage_' + str(metadata[0]) + '.pkl', 'wb') as f:
+    with open('gene_usage_' + str(metadata[1] + '_' + str(metadata[2] + '_' + str(metadata[3]))) + '.pkl', 'wb') as f:
         pickle.dump(gene_usage, f)
 
 calc_clonality(metadata, counts)

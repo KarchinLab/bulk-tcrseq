@@ -1,8 +1,8 @@
-process SIMPLE_CALC {
+process CALC_SIMPLE {
     tag "${sample_meta[1]}"
     label 'process_single'
 
-    container "domebraccia/bulktcr:0.2"
+    container "domebraccia/bulktcr:0.3"
 
     publishDir "${params.output_dir}/simple_calc", mode: 'copy'
 
@@ -10,7 +10,7 @@ process SIMPLE_CALC {
     tuple val(sample_meta), path(count_table)
 
     output:
-    path 'simple_calc.csv', emit: simple_csv
+    path 'simple_stats.csv', emit: simple_csv
     path 'gene_usage_*.pkl', emit: gene_usage_pkl
 
     script:

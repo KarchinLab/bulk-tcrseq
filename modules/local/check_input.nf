@@ -1,4 +1,4 @@
-process INPUT_CHECK {
+process CHECK_INPUT {
     tag "${sample_table}"
 
     container "domebraccia/bulktcr:0.1"
