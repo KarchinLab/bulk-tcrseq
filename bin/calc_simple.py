@@ -87,12 +87,12 @@ def calc_clonality(metadata, counts):
     v_family = counts['vFamilyName'].value_counts(dropna=False).to_dict()
     d_family = counts['dFamilyName'].value_counts(dropna=False).to_dict()
     j_family = counts['jFamilyName'].value_counts(dropna=False).to_dict()
-    v_genes = counts['vGeneName'].value_counts(dropna=False).to_dict()
-    d_genes = counts['dGeneName'].value_counts(dropna=False).to_dict()
-    j_genes = counts['jGeneName'].value_counts(dropna=False).to_dict()
+    # v_genes = counts['vGeneName'].value_counts(dropna=False).to_dict()
+    # d_genes = counts['dGeneName'].value_counts(dropna=False).to_dict()
+    # j_genes = counts['jGeneName'].value_counts(dropna=False).to_dict()
 
     # store dictionaries in a list and output to pickle file
-    gene_usage = [v_family, d_family, j_family, v_genes, d_genes, j_genes]
+    gene_usage = [v_family, d_family, j_family]     ## excluding v_genes, d_genes, j_genes
     with open('gene_usage_' + str(metadata[1] + '_' + str(metadata[2] + '_' + str(metadata[3]))) + '.pkl', 'wb') as f:
         pickle.dump(gene_usage, f)
 

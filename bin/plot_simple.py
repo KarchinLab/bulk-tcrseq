@@ -11,12 +11,17 @@ import argparse
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 import seaborn as sns
 import pickle
 import os
 
 # initialize parser
 parser = argparse.ArgumentParser(description='Plotting simple clonality calculations on TCR repertoire')
+parser.add_argument('sample_table',
+    metavar='sample_table',
+    type=argparse.FileType('r'),
+    help='metadata passed in through samples CSV file')
 parser.add_argument('combined_csv', 
     metavar='combined_csv', 
     type=argparse.FileType('r'), 
@@ -34,21 +39,6 @@ df = pd.read_csv(args.combined_csv, sep=',', header=0,
                         'num_TCRs', 'simpson_index', 'simpson_index_corrected', 'clonality',
                         'num_in', 'num_out', 'num_stop', 'pct_prod', 'pct_out', 'pct_stop', 'pct_nonprod',
                         'cdr3_avg_len'])
-
-# Read in the pickled gene usage data
-for file in args.pickle_files:
-    # get name of file
-    current_filename = os.path.splitext(os.path.basename(file.name))[0]
-
-    # dynamically name the loaded data using filename
-    globals()[current_filename] = pickle.load(file)
-    print('loaded pickle file: ' + current_filename)
-
-# global variables
-print('global variables: \n' + str(globals().keys()))
-
-# local variables
-print('local variables: \n' + str(locals().keys()))
 
 ##### ==================================================================== #####
 #
@@ -132,5 +122,34 @@ for var in ['num_clones', 'clonality', 'simpson_index_corrected', 'pct_prod', 'c
 #
 ##### ==================================================================== #####
 
-## import pickled data 
+# Read in sample metadata
+meta = pd.read_csv(args.sample_table, sep=',', header=0, index_col=None,
+                   names=['sample_id', 'file_path', 'patient_id', 'timepoint', 'origin'])
+print('metadata looks like this: \n' )
+print(meta.head())
 
+# Read in the pickled gene usage data
+for i, file in enumerate(args.pickle_files):
+    # get name of file
+    current_filename = os.path.splitext(os.path.basename(file.name))[0]
+
+    # dynamically name the loaded data using filename
+    globals()[current_filename] = pickle.load(file)
+    print('loaded pickle file: ' + current_filename)
+
+# Sort meta by patient_id 
+meta = meta.sort_values(by=['patient_id', 'timepoint'])
+
+# Loop through each patient and plot gene usage
+print('-- LOOPING THROUGH PATIENTS SAMPLES --')
+for patient in meta['patient_id'].unique():
+    patient_samples = meta[meta['patient_id'] == patient]
+    print('current patient: \n')
+    print(patient_samples)
+
+    # loop through each sample for the current patient
+    for index, row in patient_samples.iterrows():
+        # get gene usage data for the current sample
+        gene_usage_name = 'gene_usage_' + row['patient_id'] + '_' + row['timepoint'] + '_' + row['origin']
+        globals()['df_' + str(index)] = globals()[gene_usage_name]
+        

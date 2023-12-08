@@ -8,6 +8,7 @@ process PLOT_SIMPLE {
     publishDir "${params.output_dir}/plot_simple", mode: 'copy'
     
     input:
+    path sample_table
     path simple_stats_csv
     path gene_usage_pkl
 
@@ -21,8 +22,12 @@ process PLOT_SIMPLE {
 
     script:    
     """
+    ## TEST
+    echo "sample_table looks like: ${sample_table}"
+
     ## plot simple stats calculated from TCR counts data
     python $projectDir/bin/plot_simple.py \
+        $sample_table \
         $simple_stats_csv \
         $gene_usage_pkl
 
@@ -31,6 +36,11 @@ process PLOT_SIMPLE {
 
     ## render qmd report to html
     quarto render simple_stats.qmd
+    """
+
+    stub:
+    """
+    echo "1"
     """
     
     }

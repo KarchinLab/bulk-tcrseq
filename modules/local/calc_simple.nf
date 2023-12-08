@@ -12,6 +12,7 @@ process CALC_SIMPLE {
     output:
     path 'simple_stats.csv', emit: simple_csv
     path 'gene_usage_*.pkl', emit: gene_usage_pkl
+    val sample_meta        , emit: sample_meta
 
     script:
     """
@@ -23,5 +24,6 @@ process CALC_SIMPLE {
     stub:
     """
     touch simple_calc.csv
+    touch gene_usage_pt1_month0_tumor.pkl
     """
 }

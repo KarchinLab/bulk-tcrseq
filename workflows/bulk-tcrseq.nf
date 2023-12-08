@@ -78,9 +78,15 @@ workflow BULKTCR {
     CALC_SIMPLE.out.gene_usage_pkl
         .collect()
         .set { gene_usage_pkl }
+
+    CALC_SIMPLE.out.sample_meta
+        // .view()
+        .collectFile(name: 'sample_meta.csv', sort: true)
+        .set { sample_meta_csv }
     
     /////// =================== PLOT SIMPLE ===================  ///////
     PLOT_SIMPLE(
+        file(params.sample_table),
         simple_stats_csv,
         gene_usage_pkl
         )
