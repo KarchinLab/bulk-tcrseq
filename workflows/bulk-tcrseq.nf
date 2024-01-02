@@ -74,10 +74,10 @@ workflow BULKTCR {
         .collectFile(name: 'combined_simple.csv', sort: true, 
                      storeDir: params.output_dir)
         .set { simple_stats_csv }
-    
-    CALC_SIMPLE.out.gene_usage_pkl
-        .collect()
-        .set { gene_usage_pkl }
+
+    CALC_SIMPLE.out.v_family_csv
+        .collectFile(name: 'v_family.csv', sort: true)
+        .set { v_family_csv }
 
     CALC_SIMPLE.out.sample_meta
         // .view()
@@ -88,7 +88,7 @@ workflow BULKTCR {
     PLOT_SIMPLE(
         file(params.sample_table),
         simple_stats_csv,
-        gene_usage_pkl
+        v_family_csv
         )
     
 }

@@ -3,7 +3,7 @@
 """
 Description: plotting simple clonality calculations on TCR repertoire
 
-Authors: Domenick Braccia, elhanaty
+Authors: Domenick Braccia, Yuval Elhanaty
 """
 
 ## import packages
@@ -13,8 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import seaborn as sns
-import pickle
-import os
+import math
 
 # initialize parser
 parser = argparse.ArgumentParser(description='Plotting simple clonality calculations on TCR repertoire')
@@ -26,10 +25,10 @@ parser.add_argument('combined_csv',
     metavar='combined_csv', 
     type=argparse.FileType('r'), 
     help='combined CSV file')
-parser.add_argument('pickle_files', nargs='*',
-    metavar='pickle_files',
+parser.add_argument('v_family_csv',
+    metavar='v_family_csv',
     type=argparse.FileType('rb'),
-    help='pickled gene usage data')
+    help='v_family usage data in CSV file')
 
 args = parser.parse_args()
 
@@ -128,28 +127,72 @@ meta = pd.read_csv(args.sample_table, sep=',', header=0, index_col=None,
 print('metadata looks like this: \n' )
 print(meta.head())
 
-# Read in the pickled gene usage data
-for i, file in enumerate(args.pickle_files):
-    # get name of file
-    current_filename = os.path.splitext(os.path.basename(file.name))[0]
-
-    # dynamically name the loaded data using filename
-    globals()[current_filename] = pickle.load(file)
-    print('loaded pickle file: ' + current_filename)
-
-# Sort meta by patient_id 
-meta = meta.sort_values(by=['patient_id', 'timepoint'])
+# Read in v_family_csv file
+v_family = pd.read_csv(args.v_family_csv, sep=',', header=0, index_col=None,
+                       names=['patient_id', 'timepoint', 'origin', 'TCRBV01', 
+                              'TCRBV02', 'TCRBV03', 'TCRBV04', 'TCRBV05', 'TCRBV06',
+                              'TCRBV07', 'TCRBV08', 'TCRBV09', 'TCRBV10', 'TCRBV11',
+                              'TCRBV12', 'TCRBV13', 'TCRBV14', 'TCRBV15', 'TCRBV16',
+                              'TCRBV17', 'TCRBV18', 'TCRBV19', 'TCRBV20', 'TCRBV21',
+                              'TCRBV22', 'TCRBV23', 'TCRBV24', 'TCRBV25', 'TCRBV26',
+                              'TCRBV27', 'TCRBV28', 'TCRBV29', 'TCRBV30'])
+v_family = v_family.sort_values(by=['patient_id', 'timepoint'])
 
 # Loop through each patient and plot gene usage
-print('-- LOOPING THROUGH PATIENTS SAMPLES --')
-for patient in meta['patient_id'].unique():
-    patient_samples = meta[meta['patient_id'] == patient]
-    print('current patient: \n')
-    print(patient_samples)
+# Calculate the number of rows and columns
+N = len(v_family['patient_id'].unique())
+rows = math.ceil(N / 2)
+cols = 2
 
-    # loop through each sample for the current patient
-    for index, row in patient_samples.iterrows():
-        # get gene usage data for the current sample
-        gene_usage_name = 'gene_usage_' + row['patient_id'] + '_' + row['timepoint'] + '_' + row['origin']
-        globals()['df_' + str(index)] = globals()[gene_usage_name]
-        
+# Create a figure and axes for subplots
+patients = v_family['patient_id'].unique()
+fig, axes = plt.subplots(rows, cols, figsize=(12, rows*7), sharey=True)
+
+for i, ax in enumerate(axes.flatten()):
+    if i >= len(patients):
+        ax.set_visible(False)
+        continue
+    
+    pt = v_family[v_family['patient_id'] == patients[i]]
+    pt['identity'] = pt['timepoint'].str.cat(pt['origin'], sep='_')
+    
+    # removing metadata columns and set new index
+    pt_raw = pt.drop(['patient_id', 'timepoint', 'origin'], axis=1)
+    pt_raw.set_index('identity', inplace=True)
+
+    # calculate percentages for each gene from the row total
+    pt_pct = pt_raw.apply(lambda row: row / row.sum(), axis=1)
+
+    #### ================ PLOTTING ================ ####
+
+    # Create a color palette
+    colors = sns.cubehelix_palette(n_colors=len(pt_pct.columns),
+                               start = 1.75, rot = 1, reverse=True)
+    cmap1 = LinearSegmentedColormap.from_list("my_colormap", colors)
+
+    # Plot stacked bar chart for current patient
+    pt_pct.plot(ax=ax, kind='bar', stacked=True, colormap=cmap1, 
+                edgecolor='white')
+    ax.set_title(str(patients[i]))
+    ax.set_ylabel('Portion of TCRs')
+    ax.get_legend().set_visible(False)
+
+    # Align x-axis plots
+    ax.set_xticks(range(len(pt_pct.index)))
+    ax.set_xticklabels(pt_pct.index, fontsize=12,
+                       rotation=0, ha='center')
+    ax.set_xlabel('')  # Remove x-label 'identity'
+
+# Add a common title for the whole figure
+fig.suptitle('V Family Usage for All Patients', fontsize=24)
+
+# Create a common legend outside the loop
+handles, labels = ax.get_legend_handles_labels()
+fig.legend(handles, labels, loc='center left', bbox_to_anchor=(1.0, 0.5))
+
+# Adjust spacing between subplots
+plt.tight_layout()
+fig.subplots_adjust(top=0.96)
+
+plt.savefig('v_family_usage.png')
+plt.close()

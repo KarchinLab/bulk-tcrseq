@@ -83,17 +83,44 @@ def calc_clonality(metadata, counts):
                          num_in, num_out, num_stop, pct_prod, pct_out, pct_stop, pct_nonprod,
                          cdr3_avg_len])
         
-    # store v_family gene usage in a dictionary
-    v_family = counts['vFamilyName'].value_counts(dropna=False).to_dict()
-    d_family = counts['dFamilyName'].value_counts(dropna=False).to_dict()
-    j_family = counts['jFamilyName'].value_counts(dropna=False).to_dict()
-    # v_genes = counts['vGeneName'].value_counts(dropna=False).to_dict()
-    # d_genes = counts['dGeneName'].value_counts(dropna=False).to_dict()
-    # j_genes = counts['jGeneName'].value_counts(dropna=False).to_dict()
+    # store v_family gene usage in a dataframe
+    v_family = counts['vFamilyName'].value_counts(dropna=False).to_frame().T.sort_index(axis=1)
+    d_family = counts['dFamilyName'].value_counts(dropna=False).to_frame().T.sort_index(axis=1)
+    j_family = counts['jFamilyName'].value_counts(dropna=False).to_frame().T.sort_index(axis=1)
 
-    # store dictionaries in a list and output to pickle file
-    gene_usage = [v_family, d_family, j_family]     ## excluding v_genes, d_genes, j_genes
-    with open('gene_usage_' + str(metadata[1] + '_' + str(metadata[2] + '_' + str(metadata[3]))) + '.pkl', 'wb') as f:
-        pickle.dump(gene_usage, f)
+    # generate a list of all possible columns names from TCRBV01-TCRBV30
+    all_v_fam = ['TCRBV{:02d}'.format(i) for i in range(1, 31)]
+
+    # generate a list of all possible columns names from TCRBD01-TCRBD02
+    all_d_fam = ['TCRBD{:02d}'.format(i) for i in range(1, 3)]
+
+    # generate a list of all possible columns names from TCRBJ01-TCRBJ02
+    all_j_fam = ['TCRBJ{:02d}'.format(i) for i in range(1, 3)]
+
+    # add missing columns to v_family dataframe by reindexing
+    v_family_reindex = v_family.reindex(columns=all_v_fam, fill_value=0)
+    d_family_reindex = d_family.reindex(columns=all_d_fam, fill_value=0)
+    j_family_reindex = j_family.reindex(columns=all_j_fam, fill_value=0)
+
+    # add metadata columns to v_family_reindex and make them the first three columns
+    v_family_reindex.insert(0, 'origin', metadata[3])
+    v_family_reindex.insert(0, 'timepoint', metadata[2])
+    v_family_reindex.insert(0, 'patient_id', metadata[1])
+    d_family_reindex.insert(0, 'origin', metadata[3])
+    d_family_reindex.insert(0, 'timepoint', metadata[2])
+    d_family_reindex.insert(0, 'patient_id', metadata[1])
+    j_family_reindex.insert(0, 'origin', metadata[3])
+    j_family_reindex.insert(0, 'timepoint', metadata[2])
+    j_family_reindex.insert(0, 'patient_id', metadata[1])
+
+    # Write v_family_reindex to csv file with no header and no index
+    v_family_reindex.to_csv('v_family.csv', header=False, index=False)
+    d_family_reindex.to_csv('d_family.csv', header=False, index=False)
+    j_family_reindex.to_csv('j_family.csv', header=False, index=False)
+
+    # # store dictionaries in a list and output to pickle file
+    # gene_usage = [v_family, d_family, j_family]     ## excluding v_genes, d_genes, j_genes
+    # with open('gene_usage_' + str(metadata[1] + '_' + str(metadata[2] + '_' + str(metadata[3]))) + '.pkl', 'wb') as f:
+    #     pickle.dump(gene_usage, f)
 
 calc_clonality(metadata, counts)

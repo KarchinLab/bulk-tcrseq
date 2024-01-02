@@ -10,7 +10,7 @@ format:
 jupyter: python3
 ---
 
-In this notebook, you can see plots showing basic T cell repertoire statistics.
+This notebook was generated via the `bulk-tcrseq` pipeline developed at Johns Hopkins for use by BTC scientists. 
 
 # Import libraries
 
@@ -24,8 +24,6 @@ from IPython.display import Image
 Below are plots showing basic T cell repertoire statistics. Each plot has a simple description about the statistic shown. However, biological interpretation of each plot is left to the user.
 
 ## Number of clones
-
-```{python}
 
 ```{python}
 ## display the num_clones.png image
@@ -69,6 +67,15 @@ Image(filename='cdr3_avg_len.png')
 ```
 
 **Figure 5. Average CDR3 Length** The average length of the CDR3 region of the TCR. The CDR3 region is the most variable region of the TCR and is the region that determines antigen specificity. Left: Boxplot, Right: matched paitent line plot.
+
+## V gene family usage
+
+```{python}
+## display v_gene_usage.png image
+Image(filename='v_family_usage.png')
+```
+
+**Figure 6. V gene family usage.** The V gene family usage of the TCRs in each sample. The x-axis shows the timepoint collected for each individual, and the y-axis shows the proportion of TCRs that use each V gene family.
 
 # Execution environment
 

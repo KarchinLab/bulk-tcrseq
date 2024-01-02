@@ -10,7 +10,7 @@ process PLOT_SIMPLE {
     input:
     path sample_table
     path simple_stats_csv
-    path gene_usage_pkl
+    path v_family_csv
 
     output:
     path 'num_clones.png'
@@ -18,6 +18,7 @@ process PLOT_SIMPLE {
     path 'simpson_index_corrected.png'
     path 'pct_prod.png'
     path 'cdr3_avg_len.png'
+    path 'v_family_usage.png'
     path 'simple_stats.html'
 
     script:    
@@ -29,7 +30,7 @@ process PLOT_SIMPLE {
     python $projectDir/bin/plot_simple.py \
         $sample_table \
         $simple_stats_csv \
-        $gene_usage_pkl
+        $v_family_csv
 
     ## copy quarto notebook to output directory
     cp $projectDir/notebooks/plot_simple.qmd simple_stats.qmd
