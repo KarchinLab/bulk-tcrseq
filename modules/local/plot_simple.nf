@@ -3,7 +3,7 @@ process PLOT_SIMPLE {
     tag "${simple_stats_csv}"
     label 'plot_simple'
 
-    container "domebraccia/bulktcr:0.3"
+    container "domebraccia/bulktcr:0.5"
 
     publishDir "${params.output_dir}/plot_simple", mode: 'copy'
     
@@ -36,7 +36,12 @@ process PLOT_SIMPLE {
     cp $projectDir/notebooks/plot_simple.qmd simple_stats.qmd
 
     ## render qmd report to html
-    quarto render simple_stats.qmd
+    quarto render simple_stats.qmd \
+        -P project_dir:$projectDir \
+        -P sample_table:$sample_table \
+        -P simple_stats_csv:$simple_stats_csv \
+        -P v_family_csv:$v_family_csv \
+        --to html
     """
 
     stub:

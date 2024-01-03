@@ -12,11 +12,29 @@ jupyter: python3
 
 This notebook was generated via the `bulk-tcrseq` pipeline developed at Johns Hopkins for use by BTC scientists. 
 
-# Import libraries
+# Report Setup
+
+## Import pipeline parameters
+
+Default inputs are overwritten at the command line in `modules/local/plot_simple.nf`
+```{python, fold=false}
+#| tags: [parameters]
+
+project_dir='path/to/project_dir'
+sample_table='path/to/sample_table.csv'
+simple_stats_csv='path/to/simple_stats.csv'
+v_family_csv='path/to/v_family.csv'
+```
+
+## Import libraries
 
 ```{python}
 import os
 from IPython.display import Image
+import sys 
+sys.path.append(project_dir + '/bin/')
+
+from plot_utils import plot_timecourse2, plt_combined
 ```
 
 # Sample level statistics

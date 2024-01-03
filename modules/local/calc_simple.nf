@@ -2,9 +2,9 @@ process CALC_SIMPLE {
     tag "${sample_meta[1]}"
     label 'process_single'
 
-    container "domebraccia/bulktcr:0.3"
+    container "domebraccia/bulktcr:0.5"
 
-    publishDir "${params.output_dir}/simple_calc", mode: 'copy'
+    // publishDir "${params.output_dir}/simple_calc", mode: 'copy'
 
     input:
     tuple val(sample_meta), path(count_table)
