@@ -35,8 +35,13 @@ process PLOT_SIMPLE {
     ## copy quarto notebook to output directory
     cp $projectDir/notebooks/plot_simple.qmd simple_stats.qmd
 
+    ## TEST
+    echo "Work directory: $task.workDir"
+
     ## render qmd report to html
     quarto render simple_stats.qmd \
+        -P project_name:$params.project_name \
+        -P workflow_cmd:'$workflow.commandLine' \
         -P project_dir:$projectDir \
         -P sample_table:$sample_table \
         -P simple_stats_csv:$simple_stats_csv \
