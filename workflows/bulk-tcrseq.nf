@@ -42,8 +42,8 @@ Project parameters:
 */
 
 include { CHECK_INPUT } from '../modules/local/check_input.nf'
-include { CALC_SIMPLE } from '../modules/local/calc_simple.nf'
-include { PLOT_SIMPLE } from '../modules/local/plot_simple.nf'
+include { CALC_SAMPLE } from '../modules/local/calc_sample.nf'
+include { PLOT_SAMPLE } from '../modules/local/plot_sample.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,27 +68,27 @@ workflow BULKTCR {
             [meta_map, file(row.file_path)]}
         .set { sample_map }
 
-    /////// =================== CALC SIMPLE ===================  ///////
-    CALC_SIMPLE( sample_map )
+    /////// =================== CALC SAMPLE ===================  ///////
+    CALC_SAMPLE( sample_map )
 
-    CALC_SIMPLE.out.simple_csv
-        .collectFile(name: 'combined_simple.csv', sort: true, 
+    CALC_SAMPLE.out.sample_csv
+        .collectFile(name: 'sample_stats.csv', sort: true, 
                      storeDir: params.output_dir)
-        .set { simple_stats_csv }
+        .set { sample_stats_csv }
 
-    CALC_SIMPLE.out.v_family_csv
+    CALC_SAMPLE.out.v_family_csv
         .collectFile(name: 'v_family.csv', sort: true)
         .set { v_family_csv }
 
-    CALC_SIMPLE.out.sample_meta
+    CALC_SAMPLE.out.sample_meta
         // .view()
         .collectFile(name: 'sample_meta.csv', sort: true)
         .set { sample_meta_csv }
     
-    /////// =================== PLOT SIMPLE ===================  ///////
-    PLOT_SIMPLE(
+    /////// =================== PLOT SAMPLE ===================  ///////
+    PLOT_SAMPLE(
         file(params.sample_table),
-        simple_stats_csv,
+        sample_stats_csv,
         v_family_csv
         )
     
