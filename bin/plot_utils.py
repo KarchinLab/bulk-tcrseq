@@ -7,9 +7,33 @@ Authors: Domenick Braccia
 """
 
 ## import packages
+import time
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import time
+
+def TicTocGenerator():
+    # Generator that returns time differences
+    ti = 0           # initial time
+    tf = time.time() # final time
+    while True:
+        ti = tf
+        tf = time.time()
+        yield tf-ti # returns the time difference
+
+TicToc = TicTocGenerator() # create an instance of the TicTocGen generator
+
+# This will be the main function through which we define both tic() and toc()
+def toc(tempBool=True):
+    # Prints the time difference yielded by generator instance TicToc
+    tempTimeInterval = next(TicToc)
+    if tempBool:
+        print( "Elapsed time: %f seconds.\n" %tempTimeInterval )
+
+def tic():
+    # Records a time in TicToc, marks the beginning of a time interval
+    toc(False)
 
 def plot_timecourse2(df, x_col, y_col, patient_col):
     # Create a list of colors for the scatter plot points
@@ -74,3 +98,6 @@ def plt_combined (df, x_col, y_col, patient_col='patient_id'):
     ## save the plot
     print('saving figure as: ' + y_col + '.png')
     plt.savefig(y_col + '.png')
+
+    ## show the plot
+    plt.show()
